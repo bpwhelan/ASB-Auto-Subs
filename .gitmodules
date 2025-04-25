@@ -1,0 +1,3 @@
+[submodule "asbplayer"]
+	path = asbplayer
+	url = https://github.com/killergerbah/asbplayer
