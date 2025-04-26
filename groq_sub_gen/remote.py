@@ -1,23 +1,21 @@
-import asyncio
 import base64
 import os
 import subprocess
-import json
 import re
 import logging
 import time
-import pyperclip # For clipboard monitoring
 import requests
-import yt_dlp    # For YouTube downloading
-from io import BytesIO
-# from groq import Groq # Assuming groq library is installed and used
-from gradio_client import Client, handle_file
 
-# --- Configuration ---
-# Recommended: Load API key from environment variable
-# GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-# Alternative (less secure):
-# GROQ_API_KEY = "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" # Replace with your actual key if not using environment variables
+from groq_sub_gen.shared import send_subtitles_http
+
+try:
+    import yt_dlp
+    import pyperclip
+    from gradio_client import Client, handle_file
+except ImportError as e:
+    print(f"Error: Missing dependency - {e.name}")
+    print("Please install required libraries: pip install yt-dlp pyperclip gradio-client")
+    exit(1)
 
 # USE YOUR OWN WITH YOUR OWN API KEY PREFERABLY
 GRADIO_API_URL = "Nick088/Fast-Subtitle-Maker"
@@ -135,34 +133,7 @@ def is_youtube_url(url):
     )
     return bool(youtube_regex.match(url))
 
-def send_subtitles_http(srt_file_path):
-    """
-    Reads an SRT file, encodes it to Base64, and sends it to an HTTP endpoint using requests.
 
-    Args:
-        srt_file_path (str): The path to the generated SRT file.
-    """
-    http_url = "http://127.0.0.1:8766/asbplayer/load-subtitles"
-    if not os.path.exists(srt_file_path):
-        logging.error(f"SRT file does not exist: {srt_file_path}")
-        return
-    try:
-        with open(srt_file_path, 'rb') as f:
-            srt_content_bytes = f.read()
-        base64_srt = base64.b64encode(srt_content_bytes).decode('utf-8')
-        filename = os.path.basename(srt_file_path)
-        post_data = {"files": [{"name": filename, "base64": base64_srt}]}
-        response = requests.post(http_url, json=post_data)
-        if response.status_code == 200:
-            logging.info(f"Successfully sent subtitles in {filename} to {http_url}")
-            logging.debug(f"requests response: {response.text}")
-        else:
-            logging.error(f"Failed to send subtitles to {http_url}. requests returned code: {response.status_code}")
-            logging.error(f"requests response text: {response.text}")
-    except FileNotFoundError as e:
-        logging.error(f"SRT file not found: {srt_file_path}")
-    except Exception as e:
-        logging.error(f"An error occurred while sending subtitles via HTTP: {e}")
 
 def generate_subtitles_remote(audio_file_path, language="ja"):
     """Calls the remote Gradio API to generate subtitles."""
@@ -185,7 +156,7 @@ def generate_subtitles_remote(audio_file_path, language="ja"):
             api_name="/generate_subtitles"
         )
         if result and isinstance(result, tuple) and len(result) > 0:
-            return result[0]
+            return open(result[0], "r", encoding="utf-8").read()
         else:
             logging.error(f"Remote subtitle generation failed or returned unexpected result: {result}")
             return None
@@ -256,15 +227,6 @@ def main(url):
             time.sleep(5)
 
 if __name__ == "__main__":
-    try:
-        import yt_dlp
-        import pyperclip
-        from gradio_client import Client, handle_file
-    except ImportError as e:
-        print(f"Error: Missing dependency - {e.name}")
-        print("Please install required libraries: pip install yt-dlp pyperclip gradio-client")
-        exit(1)
-
     try:
         subprocess.run(["ffmpeg", "-version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
     except (subprocess.CalledProcessError, FileNotFoundError):

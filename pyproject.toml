@@ -1,0 +1,40 @@
+[build-system]
+requires = [
+    "setuptools>=61.0", # PEP 621 support in setuptools
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "asb-groq-sub"
+version = "0.1.0"
+description = "A tool for downloading YouTube audio, generating subtitles, and sending them to an HTTP endpoint."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT License" }
+authors = [
+    { name = "bpwhelan", email = "your-email@example.com" }
+]
+urls = { Homepage = "https://github.com/bpwhelan/asb-groq-sub", Repository = "https://github.com/bpwhelan/asb-groq-sub" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "yt-dlp~=2025.3.31",
+    "pyperclip~=1.9.0",
+    "gradio-client~=1.9.0",
+    "requests~=2.32.3",
+    "groq~=0.23.1",
+    "pyyaml~=6.0.1"
+]
+
+[project.scripts]
+asb-groq-sub = "groq_sub_gen.main:main"
+
+[tool.setuptools]
+packages = ["groq_sub_gen"]
+
+[tool.setuptools.package-data]
+"groq_sub_gen" = ["*"]

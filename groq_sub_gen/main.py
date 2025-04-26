@@ -69,7 +69,7 @@ async def main():
     gradio_url = config.get("GRADIO_URL", "Nick088/Fast-Subtitle-Maker")
     run_asb_websocket_server = config.get("RUN_ASB_WEBSOCKET_SERVER", True)
 
-    if run_asb_websocket_server and config.is_go_installed():
+    if run_asb_websocket_server and is_go_installed():
         asbplayer_wss = await run_asb_websocket_go_server_nonblocking()
 
     if local_or_remote not in [1, 2]:

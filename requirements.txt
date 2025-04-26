@@ -1,0 +1,6 @@
+yt-dlp~=2025.3.31
+pyperclip~=1.9.0
+gradio-client~=1.9.0
+requests~=2.32.3
+groq~=0.23.1
+pyyaml~=6.0.1
