@@ -40,6 +40,7 @@ This will be generated on first run if it doesn't exist (idk where).
    hf_token: ""
    model: "whisper-large-v3-turbo"
    # model: "whisper-large-v3"
+   output_dir: "output"
    ```
 3. Save the file.
 

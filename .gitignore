@@ -5,3 +5,4 @@
 groq_sub_gen/.env
 groq_sub_gen/config.yaml
 /groq_sub_gen/__pycache__
+*.webm

@@ -449,14 +449,12 @@ def is_youtube_url(url):
 
 
 def main():
-    global GROQ_API_KEY
-    GROQ_API_KEY = config.GROQ_API_KEY
-    if not GROQ_API_KEY:
+    if not config.GROQ_API_KEY:
         logging.error("GROQ_API_KEY not set. Cannot proceed.")
         return
 
     try:
-        groq_client = Groq(api_key=GROQ_API_KEY)
+        groq_client = Groq(api_key=config.GROQ_API_KEY)
         processor = SubtitleProcessor(groq_client=groq_client)
         logging.info("Groq client initialized.")
     except Exception as e:
