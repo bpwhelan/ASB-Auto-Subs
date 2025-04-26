@@ -37,6 +37,7 @@ This will be generated on first run if it doesn't exist (idk where).
    GROQ_API_KEY: ""
    GRADIO_URL: "Nick088/Fast-Subtitle-Maker"
    RUN_ASB_WEBSOCKET_SERVER: true
+   hf_token: ""
    ```
 3. Save the file.
 
@@ -57,6 +58,8 @@ Go here https://huggingface.co/spaces/Nick088/Fast-Subtitle-Maker
 In the top right menu hit "Duplicate Space", sign up for an account, and it will eventually ask you for your groq api key, enter it there.
 
 Once you are done with that, copy the space name, and put it in your `config.yaml`. I might need to implement one more step to make this work, but in the mean time, you can use the local versioln by setting `LOCAL_OR_REMOTE` to 1 and providing that groq api key.
+
+You also will need to make an access token (hf_token in config), you can do that [here](https://huggingface.co/settings/tokens/new?tokenType=read).
 
 ## Run the Script
 
