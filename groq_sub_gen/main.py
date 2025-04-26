@@ -1,9 +1,12 @@
 import asyncio
 import subprocess
 
+from huggingface_hub import hf_hub_url
+
 from groq_sub_gen import local, remote
 
 import yaml
+
 
 def parse_config(file_path):
     try:
@@ -15,7 +18,8 @@ def parse_config(file_path):
             "LOCAL_OR_REMOTE": 2,
             "GROQ_API_KEY": "",
             "GRADIO_URL": "Nick088/Fast-Subtitle-Maker",
-            "RUN_ASB_WEBSOCKET_SERVER": True
+            "RUN_ASB_WEBSOCKET_SERVER": True,
+            "hf_token": "",
         }
         with open(file_path, 'w') as file:
             yaml.safe_dump(default_config, file)
@@ -68,6 +72,7 @@ async def main():
     groq_api_key = config.get("GROQ_API_KEY", "")
     gradio_url = config.get("GRADIO_URL", "Nick088/Fast-Subtitle-Maker")
     run_asb_websocket_server = config.get("RUN_ASB_WEBSOCKET_SERVER", True)
+    hf_token = config.get("hf_token", "")
 
     if run_asb_websocket_server and is_go_installed():
         asbplayer_wss = await run_asb_websocket_go_server_nonblocking()
@@ -79,7 +84,7 @@ async def main():
         print("Running in Local Mode")
         local.main(groq_api_key)
     if local_or_remote == 2:
-        remote.main(gradio_url)
+        remote.main(gradio_url, hf_token)
 
     print("Exiting Groq Sub Gen")
 

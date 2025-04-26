@@ -137,7 +137,6 @@ def is_youtube_url(url):
 
 def generate_subtitles_remote(audio_file_path, language="ja"):
     """Calls the remote Gradio API to generate subtitles."""
-    client = Client(GRADIO_API_URL)
     try:
         result = client.predict(
             input_file=handle_file(audio_file_path),
@@ -164,13 +163,15 @@ def generate_subtitles_remote(audio_file_path, language="ja"):
         logging.error(f"Error calling remote subtitle generation API: {e}", exc_info=True)
         return None
 
-def main(url):
-    global GRADIO_API_URL
+def main(url, hf_token):
+    global GRADIO_API_URL, client
     GRADIO_API_URL = url
     logging.info(f"Using remote Gradio API at: {GRADIO_API_URL}")
 
     previous_clipboard_content = ""
     logging.info("Monitoring clipboard for YouTube links... (Press Ctrl+C to stop)")
+
+    client = Client(GRADIO_API_URL, hf_token=hf_token)
 
     while True:
         try:
