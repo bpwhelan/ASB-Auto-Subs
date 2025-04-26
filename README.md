@@ -83,6 +83,7 @@ If you run into issues ask in my [Discord](https://discord.gg/yP8Qse6bb8), or ma
 
 - https://github.com/killergerbah/asbplayer
 - https://huggingface.co/spaces/Nick088/Fast-Subtitle-Maker/tree/main
+- https://github.com/m1guelpf/yt-whisper for the yt-download logic/idea
 
 ## Donations
 
