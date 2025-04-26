@@ -33,11 +33,13 @@ This will be generated on first run if it doesn't exist (idk where).
 1. Open the `config.yaml` file in a text editor .
 2. Update the configuration values as needed. For example:
    ```yaml
-   LOCAL_OR_REMOTE: 2
+   LOCAL_OR_REMOTE: 2 # 1 for "Local", 2 for "Remote"
    GROQ_API_KEY: ""
    GRADIO_URL: "Nick088/Fast-Subtitle-Maker"
    RUN_ASB_WEBSOCKET_SERVER: true
    hf_token: ""
+   model: "whisper-large-v3-turbo"
+   # model: "whisper-large-v3"
    ```
 3. Save the file.
 

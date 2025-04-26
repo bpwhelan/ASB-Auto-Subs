@@ -8,13 +8,21 @@ import time
 import requests
 from groq import Groq # Assuming groq library is installed and used
 
-from groq_sub_gen.shared import send_subtitles_http
+try:
+    import yt_dlp
+    import pyperclip
+    import groq
+except ImportError as e:
+    print(f"Error: Missing dependency - {e.name}")
+    print("Please install required libraries: pip install yt-dlp pyperclip groq")
+    exit(1)
+
+from groq_sub_gen.shared import send_subtitles_http, config
 
 # --- Configuration ---
 # Recommended: Load API key from environment variable
 # GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 # Alternative (less secure):
-GROQ_API_KEY = ""
 
 # Directory to save downloaded audio and generated SRT files
 OUTPUT_DIR = "." # Save in the current directory
@@ -227,7 +235,7 @@ class SubtitleProcessor:
         timestamp_granularities_str: str = "segment",
         language: str = "ja",
         auto_detect_language: bool = False,
-        model: str = "whisper-large-v3-turbo",
+        model: str = config.model,
         include_video: bool = False, # Kept for compatibility
         # Font options kept for compatibility but ignored if include_video is False
         font_selection: str = "Default", font_file_path: str = None,
@@ -440,9 +448,9 @@ def is_youtube_url(url):
     return bool(youtube_regex.match(url))
 
 
-def main(key):
+def main():
     global GROQ_API_KEY
-    GROQ_API_KEY = key
+    GROQ_API_KEY = config.GROQ_API_KEY
     if not GROQ_API_KEY:
         logging.error("GROQ_API_KEY not set. Cannot proceed.")
         return
@@ -520,14 +528,7 @@ def test_send():
     send_subtitles_http("Hipe5_osY-k.srt")
 
 if __name__ == "__main__":
-    try:
-        import yt_dlp
-        import pyperclip
-        import groq
-    except ImportError as e:
-        print(f"Error: Missing dependency - {e.name}")
-        print("Please install required libraries: pip install yt-dlp pyperclip groq")
-        exit(1)
+
 
     try:
         subprocess.run(["ffmpeg", "-version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
@@ -536,6 +537,6 @@ if __name__ == "__main__":
         print("         Ensure ffmpeg is installed and in your system's PATH for audio extraction/conversion.")
 
     # test_send()
-    main(GROQ_API_KEY)
+    main()
 
     # End of the main.py script

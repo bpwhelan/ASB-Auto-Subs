@@ -1,8 +1,10 @@
 import base64
 import logging
 import os
+from dataclasses import dataclass
 
 import requests
+import yaml
 
 
 def send_subtitles_http(srt_file_path):
@@ -33,3 +35,39 @@ def send_subtitles_http(srt_file_path):
         logging.error(f"SRT file not found: {srt_file_path}")
     except Exception as e:
         logging.error(f"An error occurred while sending subtitles via HTTP: {e}")
+
+
+@dataclass
+class Config:
+    LOCAL_OR_REMOTE: int = 2
+    GROQ_API_KEY: str = ""
+    GRADIO_URL: str = "Nick088/Fast-Subtitle-Maker"
+    RUN_ASB_WEBSOCKET_SERVER: bool = True
+    hf_token: str = ""
+    model: str = "whisper-large-v3-turbo"
+
+def parse_config(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            config = yaml.safe_load(file)
+    except FileNotFoundError:
+        config = {
+            "LOCAL_OR_REMOTE": 2,
+            "GROQ_API_KEY": "",
+            "GRADIO_URL": "Nick088/Fast-Subtitle-Maker",
+            "RUN_ASB_WEBSOCKET_SERVER": True,
+            "hf_token": "",
+            "model": "whisper-large-v3-turbo"
+        }
+        with open(file_path, 'w') as file:
+            yaml.safe_dump(config, file)
+    return Config(
+        LOCAL_OR_REMOTE=config["LOCAL_OR_REMOTE"],
+        GROQ_API_KEY=config["GROQ_API_KEY"],
+        GRADIO_URL=config["GRADIO_URL"],
+        RUN_ASB_WEBSOCKET_SERVER=config["RUN_ASB_WEBSOCKET_SERVER"],
+        hf_token=config["hf_token"],
+        model=config['model']
+    )
+
+config = parse_config('config.yaml')

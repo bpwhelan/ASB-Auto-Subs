@@ -1,31 +1,8 @@
 import asyncio
 import subprocess
 
-from huggingface_hub import hf_hub_url
-
 from groq_sub_gen import local, remote
-
-import yaml
-
-
-def parse_config(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            config = yaml.safe_load(file)
-        return config
-    except FileNotFoundError:
-        default_config = {
-            "LOCAL_OR_REMOTE": 2,
-            "GROQ_API_KEY": "",
-            "GRADIO_URL": "Nick088/Fast-Subtitle-Maker",
-            "RUN_ASB_WEBSOCKET_SERVER": True,
-            "hf_token": "",
-        }
-        with open(file_path, 'w') as file:
-            yaml.safe_dump(default_config, file)
-        return default_config
-    except yaml.YAMLError as e:
-        raise ValueError(f"Error parsing YAML file: {e}")
+from shared import config
 
 async def run_asb_websocket_go_server_nonblocking():
     process = await asyncio.create_subprocess_exec(
@@ -61,30 +38,17 @@ def is_go_installed():
         return False
 
 async def main():
-    config_path = "config.yaml"
-    try:
-        config = parse_config(config_path)
-    except:
-        config = {}
-
-
-    local_or_remote = config.get("LOCAL_OR_REMOTE", 2)
-    groq_api_key = config.get("GROQ_API_KEY", "")
-    gradio_url = config.get("GRADIO_URL", "Nick088/Fast-Subtitle-Maker")
-    run_asb_websocket_server = config.get("RUN_ASB_WEBSOCKET_SERVER", True)
-    hf_token = config.get("hf_token", "")
-
-    if run_asb_websocket_server and is_go_installed():
+    if config.RUN_ASB_WEBSOCKET_SERVER and is_go_installed():
         asbplayer_wss = await run_asb_websocket_go_server_nonblocking()
 
-    if local_or_remote not in [1, 2]:
+    if config.RUN_ASB_WEBSOCKET_SERVER not in [1, 2]:
         print("Invalid LOCAL_OR_REMOTE value in config.yaml. Defaulting to Remote Mode.")
-        local_or_remote = 2
-    if local_or_remote == 1:
+        return
+    if config.RUN_ASB_WEBSOCKET_SERVER == 1:
         print("Running in Local Mode")
-        local.main(groq_api_key)
-    if local_or_remote == 2:
-        remote.main(gradio_url, hf_token)
+        local.main()
+    if config.RUN_ASB_WEBSOCKET_SERVER == 2:
+        remote.main()
 
     print("Exiting Groq Sub Gen")
 

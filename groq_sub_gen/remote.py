@@ -6,7 +6,7 @@ import logging
 import time
 import requests
 
-from groq_sub_gen.shared import send_subtitles_http
+from groq_sub_gen.shared import send_subtitles_http, config
 
 try:
     import yt_dlp
@@ -18,7 +18,6 @@ except ImportError as e:
     exit(1)
 
 # USE YOUR OWN WITH YOUR OWN API KEY PREFERABLY
-GRADIO_API_URL = "Nick088/Fast-Subtitle-Maker"
 
 # Directory to save downloaded audio
 OUTPUT_DIR = ".."  # Save in the current directory
@@ -144,7 +143,7 @@ def generate_subtitles_remote(audio_file_path, language="ja"):
             timestamp_granularities_str="word",
             language=language,
             auto_detect_language=False,
-            model="whisper-large-v3-turbo",
+            model=config.model,
             include_video=False,
             font_selection="Arial",
             font_file=None,
@@ -163,15 +162,14 @@ def generate_subtitles_remote(audio_file_path, language="ja"):
         logging.error(f"Error calling remote subtitle generation API: {e}", exc_info=True)
         return None
 
-def main(url, hf_token):
-    global GRADIO_API_URL, client
-    GRADIO_API_URL = url
-    logging.info(f"Using remote Gradio API at: {GRADIO_API_URL}")
+def main():
+    global client
+    logging.info(f"Using remote Gradio API at: {config.GRADIO_URL}")
 
     previous_clipboard_content = ""
     logging.info("Monitoring clipboard for YouTube links... (Press Ctrl+C to stop)")
 
-    client = Client(GRADIO_API_URL, hf_token=hf_token)
+    client = Client(config.GRADIO_URL, hf_token=config.hf_token)
 
     while True:
         try:
@@ -234,6 +232,6 @@ if __name__ == "__main__":
         print("Warning: ffmpeg command not found or failed execution.")
         print("         Ensure ffmpeg is installed and in your system's PATH for audio extraction/conversion.")
 
-    main(GRADIO_API_URL)
+    main()
 
     # End of the main.py script
