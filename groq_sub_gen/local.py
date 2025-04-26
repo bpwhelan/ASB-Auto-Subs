@@ -11,6 +11,9 @@ import requests
 import yt_dlp    # For YouTube downloading
 from io import BytesIO
 from groq import Groq # Assuming groq library is installed and used
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # --- Configuration ---
 # Recommended: Load API key from environment variable
@@ -472,9 +475,11 @@ def send_subtitles_http(srt_file_path):
     except Exception as e:
         logging.error(f"An error occurred while sending subtitles via HTTP: {e}")
 
-def main():
+def main(key):
+    global GROQ_API_KEY
+    GROQ_API_KEY = key
     if not GROQ_API_KEY:
-        logging.error("GROQ_API_KEY environment variable not set. Cannot proceed.")
+        logging.error("GROQ_API_KEY not set. Cannot proceed.")
         return
 
     try:
@@ -531,12 +536,11 @@ def main():
 
                     finally:
                         if audio_file_path and os.path.exists(audio_file_path):
-                            # try:
-                            #     os.remove(audio_file_path)
-                            #     logging.info(f"Cleaned up downloaded audio file: {audio_file_path}")
-                            # except OSError as e:
-                            #     logging.warning(f"Could not remove downloaded audio file {audio_file_path}: {e}")
-                            pass
+                            try:
+                                os.remove(audio_file_path)
+                                logging.info(f"Cleaned up downloaded audio file: {audio_file_path}")
+                            except OSError as e:
+                                logging.warning(f"Could not remove downloaded audio file {audio_file_path}: {e}")
             time.sleep(1)
 
         except pyperclip.PyperclipException as clip_err:
@@ -569,6 +573,6 @@ if __name__ == "__main__":
         print("         Ensure ffmpeg is installed and in your system's PATH for audio extraction/conversion.")
 
     # test_send()
-    main()
+    main(GROQ_API_KEY)
 
     # End of the main.py script

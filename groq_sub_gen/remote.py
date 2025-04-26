@@ -19,6 +19,7 @@ from gradio_client import Client, handle_file
 # Alternative (less secure):
 # GROQ_API_KEY = "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" # Replace with your actual key if not using environment variables
 
+# USE YOUR OWN WITH YOUR OWN API KEY PREFERABLY
 GRADIO_API_URL = "Nick088/Fast-Subtitle-Maker"
 
 # Directory to save downloaded audio
@@ -192,7 +193,9 @@ def generate_subtitles_remote(audio_file_path, language="ja"):
         logging.error(f"Error calling remote subtitle generation API: {e}", exc_info=True)
         return None
 
-def main():
+def main(url):
+    global GRADIO_API_URL
+    GRADIO_API_URL = url
     logging.info(f"Using remote Gradio API at: {GRADIO_API_URL}")
 
     previous_clipboard_content = ""
@@ -235,7 +238,11 @@ def main():
 
                     finally:
                         if audio_file_path and os.path.exists(audio_file_path):
-                            pass
+                            try:
+                                os.remove(audio_file_path)
+                                logging.info(f"Cleaned up downloaded audio file: {audio_file_path}")
+                            except OSError as e:
+                                logging.warning(f"Could not remove downloaded audio file {audio_file_path}: {e}")
             time.sleep(1)
 
         except pyperclip.PyperclipException as clip_err:
@@ -264,6 +271,6 @@ if __name__ == "__main__":
         print("Warning: ffmpeg command not found or failed execution.")
         print("         Ensure ffmpeg is installed and in your system's PATH for audio extraction/conversion.")
 
-    main()
+    main(GRADIO_API_URL)
 
     # End of the main.py script
