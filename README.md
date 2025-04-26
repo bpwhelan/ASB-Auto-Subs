@@ -40,7 +40,25 @@ This will be generated on first run if it doesn't exist (idk where).
    ```
 3. Save the file.
 
-### Run the Script
+
+
+## Duplicate the Space
+
+**I HIGHLY RECOMMEND THIS.**
+
+### Where to get Groq API Key?
+
+Can sign up here https://console.groq.com/ and after sign up it will ask you to generate an api key.
+
+### How to duplicate the spacee?
+
+Go here https://huggingface.co/spaces/Nick088/Fast-Subtitle-Maker
+
+In the top right menu hit "Duplicate Space", sign up for an account, and it will eventually ask you for your groq api key, enter it there.
+
+Once you are done with that, copy the space name, and put it in your `config.yaml`. I might need to implement one more step to make this work, but in the mean time, you can use the local versioln by setting `LOCAL_OR_REMOTE` to 1 and providing that groq api key.
+
+## Run the Script
 
 The script monitors your clipboard for YouTube links. When a valid YouTube link is detected, it automatically downloads the audio, generates subtitles, saves them, and then sends them to the ASBPlayer WebSocket server.
 
