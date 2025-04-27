@@ -17,7 +17,7 @@ except ImportError as e:
     print("Please install required libraries: pip install yt-dlp pyperclip groq")
     exit(1)
 
-from groq_sub_gen.shared import send_subtitles_http, config
+from groq_sub_gen.shared import send_subtitles_http, config, is_youtube_url, download_audio, is_language_desired
 
 # --- Configuration ---
 # Recommended: Load API key from environment variable
@@ -365,89 +365,6 @@ class SubtitleProcessor:
     # _embed_subtitles method is omitted as it's not used in this workflow
 
 
-# --- YouTube Functions (from user code) ---
-
-def download_audio(youtube_url, output_dir="."):
-    """Downloads audio from YouTube URL, returns final audio file path."""
-    logging.info(f"Attempting to download audio from: {youtube_url}")
-    # Define base name based on video ID for consistency
-    try:
-        # Extract info first to get ID
-        with yt_dlp.YoutubeDL({'quiet': True, 'verbose': False, 'skip_download': True}) as ydl:
-             info_dict_pre = ydl.extract_info(youtube_url, download=False)
-             video_id = info_dict_pre.get('id', 'youtube_audio') # Use ID or fallback name
-             base_filename = os.path.join(output_dir, video_id)
-             logging.info(f"Video ID detected: {video_id}")
-    except Exception as e:
-         logging.warning(f"Could not pre-extract video ID, using default filename: {e}")
-         base_filename = os.path.join(output_dir, "youtube_audio") # Fallback
-
-    ydl_opts = {
-        'quiet': False, # Show some progress
-        'verbose': False,
-        'format': 'bestaudio/best', # Prefer best audio, fallback to best overall
-        'outtmpl': f'{base_filename}.%(ext)s', # Use base filename + original extension
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192', # 192 kbps quality
-        }],
-        'keepvideo': False, # Don't keep the original video file if downloaded
-        'noplaylist': True, # Download only single video if URL is part of playlist
-    }
-    final_audio_path = f"{base_filename}.mp3" # Expected final path after conversion
-
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            logging.info("Starting download and audio extraction...")
-            # download=True triggers processing
-            info_dict = ydl.extract_info(youtube_url, download=True)
-            # filename might be the original downloaded one, not the post-processed one
-            # We rely on the outtmpl and postprocessor config to create the final .mp3
-            if os.path.exists(final_audio_path):
-                 logging.info(f"Audio download and conversion successful: {final_audio_path}")
-                 return final_audio_path
-            else:
-                 # Fallback check if filename from info_dict exists and is mp3
-                 downloaded_path = ydl.prepare_filename(info_dict)
-                 if downloaded_path and downloaded_path.endswith('.mp3') and os.path.exists(downloaded_path):
-                    logging.warning("yt-dlp returned a different filename than expected, using it.")
-                    # Rename if necessary to match expected pattern
-                    if downloaded_path != final_audio_path:
-                        try:
-                            os.rename(downloaded_path, final_audio_path)
-                            logging.info(f"Renamed {downloaded_path} to {final_audio_path}")
-                            return final_audio_path
-                        except OSError as rename_err:
-                            logging.error(f"Failed to rename downloaded file: {rename_err}")
-                            # Return the path yt-dlp gave, even if it's not ideal
-                            return downloaded_path
-                    else:
-                        return final_audio_path
-                 else:
-                    raise SubtitleError(f"Expected audio file not found after download: {final_audio_path}")
-
-    except yt_dlp.utils.DownloadError as e:
-        logging.error(f"yt-dlp download error: {e}")
-        return None
-    except Exception as e:
-        logging.error(f"Error during audio download/extraction: {e}", exc_info=True)
-        return None
-
-def is_youtube_url(url):
-    """Checks if the given URL is a valid YouTube URL."""
-    if not url or not isinstance(url, str):
-        return False
-    # More robust regex supporting various YouTube URL formats
-    youtube_regex = re.compile(
-        r'(?:https?:\/\/)?(?:www\.)?'
-        r'(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)'
-        r'([a-zA-Z0-9_-]{11})' # Captures the 11-character video ID
-        r'(?:\S*)?' # Optional extra characters after ID
-    )
-    return bool(youtube_regex.match(url))
-
-
 def main():
     if not config.GROQ_API_KEY:
         logging.error("GROQ_API_KEY not set. Cannot proceed.")
@@ -469,7 +386,7 @@ def main():
             current_clipboard_content = pyperclip.paste()
             if current_clipboard_content != previous_clipboard_content and current_clipboard_content:
                 previous_clipboard_content = current_clipboard_content
-                if is_youtube_url(current_clipboard_content):
+                if is_youtube_url(current_clipboard_content) and is_language_desired(current_clipboard_content, 'ja'):
                     logging.info(f"Detected YouTube link: {current_clipboard_content}")
                     audio_file_path = None
                     try:
