@@ -71,7 +71,7 @@ The script monitors your clipboard for YouTube links. When a valid YouTube link 
 To start the script:
 
 ```bash
-python groq_sub_gen/main.py
+python -m groq_sub_gen.main
 ```
 
 ## ASBPlayer WebSocket Server
