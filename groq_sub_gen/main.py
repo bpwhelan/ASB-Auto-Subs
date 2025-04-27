@@ -41,8 +41,6 @@ async def main():
     if config.RUN_ASB_WEBSOCKET_SERVER and is_go_installed():
         asbplayer_wss = await run_asb_websocket_go_server_nonblocking()
 
-    print(config)
-
     if config.LOCAL_OR_REMOTE not in [1, 2]:
         print("Invalid LOCAL_OR_REMOTE value in config.yaml. Defaulting to Remote Mode.")
         return

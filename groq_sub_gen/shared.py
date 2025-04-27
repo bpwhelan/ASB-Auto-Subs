@@ -163,6 +163,7 @@ def is_language_desired(url, desired='ja'):
     """
     Checks if the YouTube video is in desired language.
     """
+    logging.info("Checking video language...")
     try:
         with yt_dlp.YoutubeDL({'quiet': True, 'verbose': False}) as ydl:
             info_dict = ydl.extract_info(url, download=False)
@@ -170,11 +171,14 @@ def is_language_desired(url, desired='ja'):
             if language == desired:  # 'ja' is the language code for Japanese
                 return True
             else:
-                logging.info("Video language does not match desired language.")
+                print(f"Video language {language}, does not match desired language '{desired}'.")
                 override = timed_input("Override language check? Will timeout in 15 seconds. (y/n): ", timeout=15)
                 if override and override.strip().lower() in ['y', 'yes']:
                     logging.info("Language check overridden by user.")
                     return True
+                else:
+                    logging.info("Skipping video due to language mismatch.")
+                return False
     except Exception as e:
         logging.error(f"Error checking video language: {e}", exc_info=True)
     return False

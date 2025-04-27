@@ -386,47 +386,48 @@ def main():
             current_clipboard_content = pyperclip.paste()
             if current_clipboard_content != previous_clipboard_content and current_clipboard_content:
                 previous_clipboard_content = current_clipboard_content
-                if is_youtube_url(current_clipboard_content) and is_language_desired(current_clipboard_content, 'ja'):
+                if is_youtube_url(current_clipboard_content):
                     logging.info(f"Detected YouTube link: {current_clipboard_content}")
-                    audio_file_path = None
-                    try:
-                        audio_file_path = download_audio(current_clipboard_content, OUTPUT_DIR)
+                    if is_language_desired(current_clipboard_content, 'ja'):
+                        audio_file_path = None
+                        try:
+                            audio_file_path = download_audio(current_clipboard_content, OUTPUT_DIR)
 
-                        if audio_file_path and os.path.exists(audio_file_path):
-                            logging.info(f"Audio downloaded to: {audio_file_path}")
-                            base_filename = os.path.splitext(os.path.basename(audio_file_path))[0]
-                            output_srt_path = os.path.join(OUTPUT_DIR, f"{base_filename}.srt")
+                            if audio_file_path and os.path.exists(audio_file_path):
+                                logging.info(f"Audio downloaded to: {audio_file_path}")
+                                base_filename = os.path.splitext(os.path.basename(audio_file_path))[0]
+                                output_srt_path = os.path.join(OUTPUT_DIR, f"{base_filename}.srt")
 
-                            try:
-                                srt_path, _ = processor.generate_subtitles(
-                                    input_file_path=audio_file_path,
-                                    output_srt_path=output_srt_path,
-                                    timestamp_granularities_str="word",
-                                    language='ja',
-                                    auto_detect_language=False,
-                                    include_video=False
-                                )
-                                if srt_path:
-                                    logging.info(f"Subtitles generated successfully: {srt_path}")
-                                    send_subtitles_http(srt_path)
-                                else:
-                                    logging.error("Subtitle generation failed (returned None).")
+                                try:
+                                    srt_path, _ = processor.generate_subtitles(
+                                        input_file_path=audio_file_path,
+                                        output_srt_path=output_srt_path,
+                                        timestamp_granularities_str="word",
+                                        language='ja',
+                                        auto_detect_language=False,
+                                        include_video=False
+                                    )
+                                    if srt_path:
+                                        logging.info(f"Subtitles generated successfully: {srt_path}")
+                                        send_subtitles_http(srt_path)
+                                    else:
+                                        logging.error("Subtitle generation failed (returned None).")
 
-                            except (SubtitleError, ValueError, groq.GroqError) as sub_err:
-                                logging.error(f"Error during subtitle generation: {sub_err}")
-                            except Exception as gen_err:
-                                logging.error(f"Unexpected error during subtitle generation: {gen_err}", exc_info=True)
+                                except (SubtitleError, ValueError, groq.GroqError) as sub_err:
+                                    logging.error(f"Error during subtitle generation: {sub_err}")
+                                except Exception as gen_err:
+                                    logging.error(f"Unexpected error during subtitle generation: {gen_err}", exc_info=True)
 
-                        else:
-                            logging.error("Audio download failed or file not found.")
+                            else:
+                                logging.error("Audio download failed or file not found.")
 
-                    finally:
-                        if audio_file_path and os.path.exists(audio_file_path):
-                            try:
-                                os.remove(audio_file_path)
-                                logging.info(f"Cleaned up downloaded audio file: {audio_file_path}")
-                            except OSError as e:
-                                logging.warning(f"Could not remove downloaded audio file {audio_file_path}: {e}")
+                        finally:
+                            if audio_file_path and os.path.exists(audio_file_path):
+                                try:
+                                    os.remove(audio_file_path)
+                                    logging.info(f"Cleaned up downloaded audio file: {audio_file_path}")
+                                except OSError as e:
+                                    logging.warning(f"Could not remove downloaded audio file {audio_file_path}: {e}")
             time.sleep(1)
 
         except pyperclip.PyperclipException as clip_err:

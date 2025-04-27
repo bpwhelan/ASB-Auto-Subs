@@ -96,44 +96,44 @@ def main():
             current_clipboard_content = pyperclip.paste()
             if current_clipboard_content != previous_clipboard_content and current_clipboard_content:
                 previous_clipboard_content = current_clipboard_content
-                if is_youtube_url(current_clipboard_content) and is_language_desired(current_clipboard_content, "ja"):
-
+                if is_youtube_url(current_clipboard_content):
                     logging.info(f"Detected YouTube link: {current_clipboard_content}")
-                    audio_file_path = None
-                    try:
-                        audio_file_path = download_audio(current_clipboard_content, OUTPUT_DIR)
+                    if is_language_desired(current_clipboard_content, "ja"):
+                        audio_file_path = None
+                        try:
+                            audio_file_path = download_audio(current_clipboard_content, OUTPUT_DIR)
 
-                        if audio_file_path and os.path.exists(audio_file_path):
-                            logging.info(f"Audio downloaded to: {audio_file_path}")
-                            base_filename = os.path.splitext(os.path.basename(audio_file_path))[0]
-                            output_srt_path = os.path.join(OUTPUT_DIR, f"{base_filename}.srt")
+                            if audio_file_path and os.path.exists(audio_file_path):
+                                logging.info(f"Audio downloaded to: {audio_file_path}")
+                                base_filename = os.path.splitext(os.path.basename(audio_file_path))[0]
+                                output_srt_path = os.path.join(OUTPUT_DIR, f"{base_filename}.srt")
 
-                            try:
-                                remote_srt_content = generate_subtitles_remote(audio_file_path, language='ja')
-                                if remote_srt_content:
-                                    try:
-                                        with open(output_srt_path, "w", encoding="utf-8") as f:
-                                            f.write(remote_srt_content)
-                                        logging.info(f"Subtitles generated successfully and saved to: {output_srt_path}")
-                                        send_subtitles_http(output_srt_path)
-                                    except IOError as e:
-                                        logging.error(f"Failed to write SRT content to {output_srt_path}: {e}")
-                                else:
-                                    logging.error("Remote subtitle generation failed (returned None content).")
+                                try:
+                                    remote_srt_content = generate_subtitles_remote(audio_file_path, language='ja')
+                                    if remote_srt_content:
+                                        try:
+                                            with open(output_srt_path, "w", encoding="utf-8") as f:
+                                                f.write(remote_srt_content)
+                                            logging.info(f"Subtitles generated successfully and saved to: {output_srt_path}")
+                                            send_subtitles_http(output_srt_path)
+                                        except IOError as e:
+                                            logging.error(f"Failed to write SRT content to {output_srt_path}: {e}")
+                                    else:
+                                        logging.error("Remote subtitle generation failed (returned None content).")
 
-                            except Exception as gen_err:
-                                logging.error(f"Unexpected error during remote subtitle generation: {gen_err}", exc_info=True)
+                                except Exception as gen_err:
+                                    logging.error(f"Unexpected error during remote subtitle generation: {gen_err}", exc_info=True)
 
-                        else:
-                            logging.error("Audio download failed or file not found.")
+                            else:
+                                logging.error("Audio download failed or file not found.")
 
-                    finally:
-                        if audio_file_path and os.path.exists(audio_file_path):
-                            try:
-                                os.remove(audio_file_path)
-                                logging.info(f"Cleaned up downloaded audio file: {audio_file_path}")
-                            except OSError as e:
-                                logging.warning(f"Could not remove downloaded audio file {audio_file_path}: {e}")
+                        finally:
+                            if audio_file_path and os.path.exists(audio_file_path):
+                                try:
+                                    os.remove(audio_file_path)
+                                    logging.info(f"Cleaned up downloaded audio file: {audio_file_path}")
+                                except OSError as e:
+                                    logging.warning(f"Could not remove downloaded audio file {audio_file_path}: {e}")
             time.sleep(1)
 
         except pyperclip.PyperclipException as clip_err:
