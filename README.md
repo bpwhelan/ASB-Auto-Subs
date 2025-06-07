@@ -48,8 +48,6 @@ This will be generated on first run if it doesn't exist (idk where).
 
 ## Duplicate the Space
 
-**I HIGHLY RECOMMEND THIS.**
-
 ### Where to get Groq API Key?
 
 Can sign up here https://console.groq.com/ and after sign up it will ask you to generate an api key.
