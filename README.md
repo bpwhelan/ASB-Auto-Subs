@@ -46,13 +46,15 @@ This will be generated on first run if it doesn't exist (idk where).
 
 
 
-## Duplicate the Space
+## Setup API Usage
 
 ### Where to get Groq API Key?
 
 Can sign up here https://console.groq.com/ and after sign up it will ask you to generate an api key.
 
 ### How to duplicate the spacee?
+
+This is optional... I recommend just using "local" with the `GROQ_API_KEY` present in the config
 
 Go here https://huggingface.co/spaces/Nick088/Fast-Subtitle-Maker
 
