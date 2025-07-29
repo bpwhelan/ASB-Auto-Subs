@@ -1,6 +1,6 @@
-﻿# ASB Groq Sub
+﻿# ASB Auto Subs
 
-ASB Groq Sub (Name Pending)is a tool for generating subtitles from YouTube videos using a remote Gradio API. It monitors the clipboard for YouTube links, downloads the audio, and generates subtitles in `.srt` format. The project also integrates with the ASBPlayer WebSocket server for automatically loading subtitles.
+ASB Auto Subs is a tool for generating subtitles from YouTube videos using a remote Gradio API. It monitors the clipboard for YouTube links, downloads the audio, and generates subtitles in `.srt` format. The project also integrates with the ASBPlayer WebSocket server for automatically loading subtitles.
 
 Currently Hard-coded for japanese, but you can change it in `groq_sub_gen/local.py` or `groq_sub_gen/remote.py` to any language you want.
 
