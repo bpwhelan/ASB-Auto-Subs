@@ -1,7 +1,7 @@
 import asyncio
 import subprocess
 
-from groq_sub_gen import local, remote
+from groq_sub_gen import watcher
 from groq_sub_gen.shared import config
 
 async def run_asb_websocket_go_server_nonblocking():
@@ -41,14 +41,7 @@ async def main():
     if config.RUN_ASB_WEBSOCKET_SERVER and is_go_installed():
         asbplayer_wss = await run_asb_websocket_go_server_nonblocking()
 
-    if config.LOCAL_OR_REMOTE not in [1, 2]:
-        print("Invalid LOCAL_OR_REMOTE value in config.yaml. Defaulting to Remote Mode.")
-        return
-    if config.LOCAL_OR_REMOTE == 1:
-        print("Running in Local Mode")
-        local.main()
-    if config.LOCAL_OR_REMOTE == 2:
-        remote.main()
+    watcher.main()
 
     print("Exiting Groq Sub Gen")
 

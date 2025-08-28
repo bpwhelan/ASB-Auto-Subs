@@ -17,7 +17,7 @@ except ImportError as e:
     print("Please install required libraries: pip install yt-dlp pyperclip groq")
     exit(1)
 
-from groq_sub_gen.shared import send_subtitles_http, config, is_youtube_url, download_audio, is_language_desired
+from groq_sub_gen.shared import *
 
 # --- Configuration ---
 # Recommended: Load API key from environment variable
@@ -67,11 +67,11 @@ class SubtitleError(Exception):
 
 # --- Subtitle Processor Class (Previously Refactored) ---
 class SubtitleProcessor:
-
-    def __init__(self, groq_client):
-        if not groq_client:
-            raise ValueError("A valid Groq API client instance is required.")
+    def __init__(self, groq_client=None, local_processor=None):
+        if not groq_client and not local_processor:
+            raise ValueError("At least one of 'groq_client' or 'local_processor' must be provided.")
         self.client = groq_client
+        self.local_processor: StableTSProcessor = local_processor
         self._temp_files = []
 
     def _run_command(self, cmd_list):
@@ -161,7 +161,7 @@ class SubtitleProcessor:
         finally:
              if list_file_path not in self._temp_files: self._temp_files.append(list_file_path)
 
-    def _check_and_prepare_file(self, input_file_path):
+    def _check_and_prepare_file(self, input_file_path, split=False):
         if not input_file_path or not os.path.exists(input_file_path):
             raise FileNotFoundError(f"Input file not found: {input_file_path}")
         try: file_size_mb = os.path.getsize(input_file_path) / (1024 * 1024)
@@ -169,6 +169,9 @@ class SubtitleProcessor:
         file_extension = os.path.splitext(input_file_path)[1].lower().lstrip('.')
         if file_extension not in ALLOWED_FILE_EXTENSIONS:
             raise ValueError(f"Invalid file type (.{file_extension}). Allowed: {', '.join(ALLOWED_FILE_EXTENSIONS)}")
+        if not split:
+            return input_file_path, None  # No processing needed if not splitting
+        
         if file_size_mb <= MAX_FILE_SIZE_MB:
             logging.info(f"File '{os.path.basename(input_file_path)}' ({file_size_mb:.2f} MB) within size limit.")
             return input_file_path, None
@@ -250,8 +253,8 @@ class SubtitleProcessor:
                  raise ValueError(f"Invalid language code '{language}'. Check LANGUAGE_CODES.")
             # Skip font validation if not embedding video
             # ...
-
-            processed_path_or_chunks, status = self._check_and_prepare_file(input_file_path)
+        
+            processed_path_or_chunks, status = self._check_and_prepare_file(input_file_path, split=self.local_processor is None)
             is_split = (status == "split")
 
             full_srt_content_list = []
@@ -272,17 +275,22 @@ class SubtitleProcessor:
                 chunk_srt_content = ""
                 try:
                     with open(current_file_path, "rb") as file_data:
-                        transcription_response = self.client.audio.transcriptions.create(
-                            file=(os.path.basename(current_file_path), file_data.read()),
-                            model=model, prompt=prompt, response_format="verbose_json",
-                            timestamp_granularities=timestamp_granularities_list,
-                            language=None if auto_detect_language else language, temperature=0.0,
+                        if not self.local_processor:
+                            transcription_response = self.client.audio.transcriptions.create(
+                                file=(os.path.basename(current_file_path), file_data.read()),
+                                model=model, prompt=prompt, response_format="verbose_json",
+                                timestamp_granularities=timestamp_granularities_list,
+                                language=None if auto_detect_language else language, temperature=0.0,
+                            )
+                        else: 
+                            transcription_response = self.local_processor.get_audio_segments(
+                            current_file_path, language=language, word_timestamps=(primary_granularity == "word"),
                         )
 
                     # Simplified logic assuming response format is consistent
-                    word_data = getattr(transcription_response, 'words', None)
-                    segment_data = getattr(transcription_response, 'segments', None)
-
+                    word_data = getattr(transcription_response, 'words', transcription_response.get('words', []))
+                    segment_data = getattr(transcription_response, 'segments', transcription_response.get('segments', []))
+                    
                     if primary_granularity == "word":
                         if word_data:
                             adjusted_word_data = []
@@ -366,13 +374,16 @@ class SubtitleProcessor:
 
 
 def main():
-    if not config.GROQ_API_KEY:
-        logging.error("GROQ_API_KEY not set. Cannot proceed.")
-        return
-
     try:
         groq_client = Groq(api_key=config.GROQ_API_KEY)
-        processor = SubtitleProcessor(groq_client=groq_client)
+        if config.process_locally:
+            logging.info("Processing subtitles locally.")
+            processor = SubtitleProcessor(local_processor=StableTSProcessor())
+        else:
+            if not config.GROQ_API_KEY:
+                logging.error("GROQ_API_KEY not set. Cannot proceed.")
+                return
+            processor = SubtitleProcessor(groq_client=groq_client)
         logging.info("Groq client initialized.")
     except Exception as e:
         logging.error(f"Failed to initialize Groq client: {e}")
@@ -395,28 +406,7 @@ def main():
 
                             if audio_file_path and os.path.exists(audio_file_path):
                                 logging.info(f"Audio downloaded to: {audio_file_path}")
-                                base_filename = os.path.splitext(os.path.basename(audio_file_path))[0]
-                                output_srt_path = os.path.join(OUTPUT_DIR, f"{base_filename}.srt")
-
-                                try:
-                                    srt_path, _ = processor.generate_subtitles(
-                                        input_file_path=audio_file_path,
-                                        output_srt_path=output_srt_path,
-                                        timestamp_granularities_str="word",
-                                        language='ja',
-                                        auto_detect_language=False,
-                                        include_video=False
-                                    )
-                                    if srt_path:
-                                        logging.info(f"Subtitles generated successfully: {srt_path}")
-                                        send_subtitles_http(srt_path)
-                                    else:
-                                        logging.error("Subtitle generation failed (returned None).")
-
-                                except (SubtitleError, ValueError, groq.GroqError) as sub_err:
-                                    logging.error(f"Error during subtitle generation: {sub_err}")
-                                except Exception as gen_err:
-                                    logging.error(f"Unexpected error during subtitle generation: {gen_err}", exc_info=True)
+                                get_subs(processor, audio_file_path)
 
                             else:
                                 logging.error("Audio download failed or file not found.")
@@ -428,6 +418,20 @@ def main():
                                     logging.info(f"Cleaned up downloaded audio file: {audio_file_path}")
                                 except OSError as e:
                                     logging.warning(f"Could not remove downloaded audio file {audio_file_path}: {e}")
+                elif is_file_path(current_clipboard_content):
+                    path = current_clipboard_content.strip().replace('"', '').replace("'", "")
+                    try:
+                        audio = extract_audio_from_local_video(path)
+                    except Exception as e:
+                        logging.error(f"Error extracting audio from local video: {e}")
+                        return
+                    
+                    if audio and os.path.exists(audio):
+                        get_subs(processor, audio)
+                        logging.info(f"Audio extracted from local video: {audio}")
+                    else:
+                        logging.error("Audio extraction failed.")
+                        return
             time.sleep(1)
 
         except pyperclip.PyperclipException as clip_err:
@@ -439,6 +443,31 @@ def main():
         except Exception as loop_err:
             logging.error(f"Error in main loop: {loop_err}", exc_info=True)
             time.sleep(5)
+
+def get_subs(processor, audio_file_path):
+        processor: SubtitleProcessor
+        base_filename = os.path.splitext(os.path.basename(audio_file_path))[0]
+        output_srt_path = os.path.join(OUTPUT_DIR, f"{base_filename}.srt")
+
+        try:
+            srt_path, _ = processor.generate_subtitles(
+                                            input_file_path=audio_file_path,
+                                            output_srt_path=output_srt_path,
+                                            timestamp_granularities_str="segment",
+                                            language='ja',
+                                            auto_detect_language=False,
+                                            include_video=False
+                                        )
+            if srt_path:
+                logging.info(f"Subtitles generated successfully: {srt_path}")
+                send_subtitles_http(srt_path)
+            else:
+                logging.error("Subtitle generation failed (returned None).")
+
+        except (SubtitleError, ValueError, groq.GroqError) as sub_err:
+            logging.error(f"Error during subtitle generation: {sub_err}")
+        except Exception as gen_err:
+            logging.error(f"Unexpected error during subtitle generation: {gen_err}", exc_info=True)
 
 def test_send():
     send_subtitles_http("Hipe5_osY-k.srt")

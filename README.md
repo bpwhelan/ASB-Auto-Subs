@@ -1,8 +1,9 @@
 ﻿# ASB Auto Subs
 
-ASB Auto Subs is a tool for generating subtitles from YouTube videos using a remote Gradio API. It monitors the clipboard for YouTube links, downloads the audio, and generates subtitles in `.srt` format. The project also integrates with the ASBPlayer WebSocket server for automatically loading subtitles.
+ASB Auto Subs is a tool for generating subtitles from YouTube videos using whisper locally, or groq remotely. It monitors the clipboard for YouTube links, as well as file path (shift right click "copy as path" on windows), gets the audio, and generates subtitles in `.srt` format. The project also integrates with the ASBPlayer WebSocket server for automatically loading subtitles.
 
 Currently Hard-coded for japanese, but you can change it in `groq_sub_gen/local.py` or `groq_sub_gen/remote.py` to any language you want.
+
 
 ## Getting Started
 
@@ -33,18 +34,30 @@ This will be generated on first run if it doesn't exist (idk where).
 1. Open the `config.yaml` file in a text editor .
 2. Update the configuration values as needed. For example:
    ```yaml
-   LOCAL_OR_REMOTE: 2 # 1 for "Local", 2 for "Remote"
+   process_locally: true
+   whisper_model: "small"
    GROQ_API_KEY: ""
-   GRADIO_URL: "Nick088/Fast-Subtitle-Maker"
    RUN_ASB_WEBSOCKET_SERVER: true
    hf_token: ""
    model: "whisper-large-v3-turbo"
    # model: "whisper-large-v3"
    output_dir: "output"
+   language: "ja"
+   cookies: ""
    ```
 3. Save the file.
 
+#### What Each Config Does:
 
+- `process_locally`: Determines if the transcription is done locally or via the groq API.
+- `whisper_model`: The whisper model to use for local transcription.
+- `GROQ_API_KEY`: Your API key for accessing Groq's services.
+- `RUN_ASB_WEBSOCKET_SERVER`: Whether to run the ASBPlayer WebSocket server.
+- `hf_token`: Hugging Face token for authentication.
+- `model`: The groq transcription model to use.
+- `output_dir`: Directory where output files are saved.
+- `language`: Language code for transcription. Also used to check if the video's language is what we want.
+- `cookies`: Cookies for authenticated yt-dlp requests.
 
 ## Setup API Usage
 
