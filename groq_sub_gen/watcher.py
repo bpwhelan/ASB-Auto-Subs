@@ -286,8 +286,9 @@ class SubtitleProcessor:
                             transcription_response = self.local_processor.get_audio_segments(
                             current_file_path, language=language, word_timestamps=(primary_granularity == "word"),
                         )
-
-                    # Simplified logic assuming response format is consistent
+                            
+                    # Normalize to a dict for both local and remote.
+                    transcription_response = dict(transcription_response)
                     word_data = getattr(transcription_response, 'words', transcription_response.get('words', []))
                     segment_data = getattr(transcription_response, 'segments', transcription_response.get('segments', []))
                     
