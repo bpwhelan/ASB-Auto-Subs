@@ -27,7 +27,7 @@ cd asb-groq-sub
 
 ### Configure `config.yaml`
 
-Before running the project, you need to configure the `config.yaml` file. This file contains essential settings such as the Gradio API URL and other parameters.
+Before running the project, you need to configure the `config.yaml` file. This file contains essential settings, changing how asb-auto-subs will behave.
 
 This will be generated on first run if it doesn't exist (idk where).
 
@@ -38,7 +38,6 @@ This will be generated on first run if it doesn't exist (idk where).
    whisper_model: "small"
    GROQ_API_KEY: ""
    RUN_ASB_WEBSOCKET_SERVER: true
-   hf_token: ""
    model: "whisper-large-v3-turbo"
    # model: "whisper-large-v3"
    output_dir: "output"
@@ -53,7 +52,6 @@ This will be generated on first run if it doesn't exist (idk where).
 - `whisper_model`: The whisper model to use for local transcription.
 - `GROQ_API_KEY`: Your API key for accessing Groq's services.
 - `RUN_ASB_WEBSOCKET_SERVER`: Whether to run the ASBPlayer WebSocket server.
-- `hf_token`: Hugging Face token for authentication.
 - `model`: The groq transcription model to use.
 - `output_dir`: Directory where output files are saved.
 - `language`: Language code for transcription. Also used to check if the video's language is what we want.
@@ -64,18 +62,6 @@ This will be generated on first run if it doesn't exist (idk where).
 ### Where to get Groq API Key? (REQUIRED)
 
 Can sign up here https://console.groq.com/ and after sign up it will ask you to generate an api key.
-
-### How to duplicate the spacee? (OPTIONAL)
-
-**This is optional... I recommend just using "local" with the `GROQ_API_KEY` present in the config**
-
-Go here https://huggingface.co/spaces/Nick088/Fast-Subtitle-Maker
-
-In the top right menu hit "Duplicate Space", sign up for an account, and it will eventually ask you for your groq api key, enter it there.
-
-Once you are done with that, copy the space name, and put it in your `config.yaml`.
-
-You also will need to make an access token (hf_token in config), you can do that [here](https://huggingface.co/settings/tokens/new?tokenType=read).
 
 ## Run the Script
 
@@ -105,3 +91,4 @@ If you run into issues ask in my [Discord](https://discord.gg/yP8Qse6bb8), or ma
 
 If you've benefited from this or any of my other projects, please consider supporting my work
 via [Github Sponsors](https://github.com/sponsors/bpwhelan) or [Ko-fi.](https://ko-fi.com/beangate)
+
