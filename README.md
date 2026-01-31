@@ -79,7 +79,7 @@ This project integrates with the ASBPlayer WebSocket server for subtitle synchro
 
 ## Contact
 
-If you run into issues ask in my [Discord](https://discord.gg/yP8Qse6bb8), or make an issue here.
+If you run into issues, you can make an issue [here](https://github.com/bpwhelan/ASB-Auto-Subs/issues).
 
 ## Credits
 
@@ -91,4 +91,5 @@ If you run into issues ask in my [Discord](https://discord.gg/yP8Qse6bb8), or ma
 
 If you've benefited from this or any of my other projects, please consider supporting my work
 via [Github Sponsors](https://github.com/sponsors/bpwhelan) or [Ko-fi.](https://ko-fi.com/beangate)
+
 
