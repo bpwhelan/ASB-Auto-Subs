@@ -7,23 +7,27 @@ Currently Hard-coded for japanese, but you can change it in `groq_sub_gen/local.
 
 ## Getting Started
 
-### Clone the Repository
+### Install the Package
 
-To get started, clone this repository:
+To get started, pip install the package:
+
+pip
 
 ```bash
-git clone --recurse-submodules https://github.com/bpwhelan/asb-groq-sub.git
-cd asb-groq-sub
+pip install groq-sub-gen
+```
+
+uv
+
+```bash
+uv tool install groq-sub-gen
 ```
 
 ### Requirements
 
-- Python 3.8+
+- Python 3.11+
 - `ffmpeg` installed and available in your system's PATH
-- Required Python libraries (install via `pip`):
-  ```bash
-  pip install -r requirements.txt
-  ```
+- `go` installed and available in your system's PATH (for the asbplayer websocket server)
 
 ### Configure `config.yaml`
 
@@ -72,7 +76,7 @@ The script monitors your clipboard for YouTube links. When a valid YouTube link 
 To start the script:
 
 ```bash
-python -m groq_sub_gen.main
+groq-sub-gen
 ```
 
 ## ASBPlayer WebSocket Server

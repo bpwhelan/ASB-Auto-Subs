@@ -1,13 +1,31 @@
 import asyncio
 import subprocess
+from pathlib import Path
+
+import asbplayer
 
 from groq_sub_gen import watcher
 from groq_sub_gen.shared import config
 
+def _asb_websocket_server_dir() -> Path:
+    packaged_path = Path(asbplayer.__file__).resolve().parent / "scripts" / "web-socket-server"
+    if (packaged_path / "main.go").exists():
+        return packaged_path
+
+    repo_path = Path(__file__).resolve().parents[1] / "asbplayer" / "scripts" / "web-socket-server"
+    if (repo_path / "main.go").exists():
+        return repo_path
+
+    raise FileNotFoundError(
+        "Could not find asbplayer web-socket-server files. "
+        "Rebuild/install the package so asbplayer assets are included."
+    )
+
 async def run_asb_websocket_go_server_nonblocking():
+    server_dir = _asb_websocket_server_dir()
     process = await asyncio.create_subprocess_exec(
         "go", "run", "main.go",
-        cwd="./asbplayer/scripts/web-socket-server",
+        cwd=str(server_dir),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )
@@ -38,10 +56,13 @@ def is_go_installed():
         return False
 
 async def main():
+    print("Checking for Go installation...")
     if config.RUN_ASB_WEBSOCKET_SERVER and is_go_installed():
         asbplayer_wss = await run_asb_websocket_go_server_nonblocking()
+        
+    print("Starting Groq Sub Gen...")
 
-    watcher.main()
+    await watcher.main()
 
     print("Exiting Groq Sub Gen")
 

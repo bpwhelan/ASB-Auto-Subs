@@ -7,3 +7,5 @@ config.yaml
 /groq_sub_gen/__pycache__
 *.webm
 /logs
+/build
+/asb_groq_sub.egg-info

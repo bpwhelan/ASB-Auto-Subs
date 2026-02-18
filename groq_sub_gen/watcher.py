@@ -374,7 +374,7 @@ class SubtitleProcessor:
     # _embed_subtitles method is omitted as it's not used in this workflow
 
 
-def main():
+async def main():
     try:
         groq_client = Groq(api_key=config.GROQ_API_KEY)
         if config.process_locally:
