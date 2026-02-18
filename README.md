@@ -2,9 +2,6 @@
 
 ASB Auto Subs is a tool for generating subtitles from YouTube videos using whisper locally, or groq remotely. It monitors the clipboard for YouTube links, as well as file path (shift right click "copy as path" on windows), gets the audio, and generates subtitles in `.srt` format. The project also integrates with the ASBPlayer WebSocket server for automatically loading subtitles.
 
-Currently Hard-coded for japanese, but you can change it in `groq_sub_gen/local.py` or `groq_sub_gen/remote.py` to any language you want.
-
-
 ## Getting Started
 
 ### Install the Package
@@ -14,13 +11,13 @@ To get started, pip install the package:
 pip
 
 ```bash
-pip install groq-sub-gen
+pip install asb_auto_subgen
 ```
 
 uv
 
 ```bash
-uv tool install groq-sub-gen
+uv tool install asb_auto_subgen
 ```
 
 ### Requirements
@@ -76,7 +73,7 @@ The script monitors your clipboard for YouTube links. When a valid YouTube link 
 To start the script:
 
 ```bash
-groq-sub-gen
+asb_auto_subgen
 ```
 
 ## ASBPlayer WebSocket Server
