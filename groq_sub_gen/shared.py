@@ -90,10 +90,11 @@ class Config:
     model: str = "whisper-large-v3-turbo"
     output_dir: str = "output"
     language: str = "ja"
+    skip_language_check: bool = False
     # path_to_watch: str = "./watch"
     cookies: str = ""
 
-    def __init__(self, process_locally=True, GROQ_API_KEY="", whisper_model="turbo", RUN_ASB_WEBSOCKET_SERVER=True, model="whisper-large-v3-turbo", output_dir="output", language="ja", path_to_watch="./watch", cookies="", *args, **kwargs):
+    def __init__(self, process_locally=True, GROQ_API_KEY="", whisper_model="turbo", RUN_ASB_WEBSOCKET_SERVER=True, model="whisper-large-v3-turbo", output_dir="output", language="ja", skip_language_check=False, path_to_watch="./watch", cookies="", *args, **kwargs):
         self.process_locally = process_locally
         self.GROQ_API_KEY = GROQ_API_KEY
         self.whisper_model = whisper_model
@@ -101,6 +102,7 @@ class Config:
         self.model = model
         self.output_dir = output_dir
         self.language = language
+        self.skip_language_check = skip_language_check
         # self.path_to_watch = path_to_watch
         self.cookies = cookies
 
@@ -224,6 +226,10 @@ def is_language_desired(url, desired='ja'):
     """
     Checks if the YouTube video is in desired language.
     """
+    if config.skip_language_check:
+        logging.info("Skipping language check due to config.skip_language_check=true.")
+        return True
+
     logging.info("Checking video language...")
     yt_dlp_ops = {'quiet': True, 'verbose': False}
     if config.cookies:
@@ -248,6 +254,14 @@ def is_language_desired(url, desired='ja'):
                 return False
     except Exception as e:
         logging.error(f"Error checking video language: {e}", exc_info=True)
+        override = timed_input(
+            "Language check failed due to an error. Override and continue? Will timeout in 15 seconds. (y/n): ",
+            timeout=15
+        )
+        if override and override.strip().lower() in ['y', 'yes']:
+            logging.info("Language check error overridden by user.")
+            return True
+        logging.info("Skipping video due to language check error.")
     return False
 
 

@@ -42,6 +42,7 @@ This will be generated on first run if it doesn't exist (idk where).
    # model: "whisper-large-v3"
    output_dir: "output"
    language: "ja"
+   skip_language_check: false
    cookies: ""
    ```
 3. Save the file.
@@ -55,6 +56,7 @@ This will be generated on first run if it doesn't exist (idk where).
 - `model`: The groq transcription model to use.
 - `output_dir`: Directory where output files are saved.
 - `language`: Language code for transcription. Also used to check if the video's language is what we want.
+- `skip_language_check`: When `true`, bypasses YouTube metadata language validation entirely.
 - `cookies`: Cookies for authenticated yt-dlp requests.
 
 ## Setup API Usage
