@@ -10,22 +10,22 @@ To get started, pip install the package:
 
 pip
 ```bash
-pip install asb_auto_subgen
+pip install asb-auto-subgen
 ```
 
 OR
 ```bash
-uv tool install asb_auto_subgen
+uv tool install asb-auto-subgen
 ```
 
 If you want to run whisper locally...
 
 ```bash
-pip install asb_auto_subgen[local]
+pip install asb-auto-subgen[local]
 ```
 OR
 ```bash
-uv tool install asb_auto_subgen[local]
+uv tool install asb-auto-subgen[local]
 ```
 
 
@@ -82,7 +82,7 @@ The script monitors your clipboard for YouTube links. When a valid YouTube link 
 To start the script:
 
 ```bash
-asb_auto_subgen
+asb-auto-subgen
 ```
 
 ## ASBPlayer WebSocket Server
@@ -103,6 +103,7 @@ If you run into issues, you can make an issue [here](https://github.com/bpwhelan
 
 If you've benefited from this or any of my other projects, please consider supporting my work
 via [Github Sponsors](https://github.com/sponsors/bpwhelan) or [Ko-fi.](https://ko-fi.com/beangate)
+
 
 
 
