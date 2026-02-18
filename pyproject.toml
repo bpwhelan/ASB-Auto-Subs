@@ -1,4 +1,4 @@
-[build-system]
+﻿[build-system]
 requires = [
     "setuptools>=61.0", # PEP 621 support in setuptools
     "wheel"
@@ -15,7 +15,7 @@ license = { text = "MIT License" }
 authors = [
     { name = "bpwhelan", email = "your-email@example.com" }
 ]
-urls = { Homepage = "https://github.com/bpwhelan/ASB-Auto-Subs", Repository = "https://github.com/bpwhelan/ASB-Auto-Subs" }
+urls = { Homepage = "https://github.com/bpwhelan/ASB-Auto-Subgen", Repository = "https://github.com/bpwhelan/ASB-Auto-Subgen" }
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
