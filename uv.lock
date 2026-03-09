@@ -30,7 +30,7 @@ wheels = [
 
 [[package]]
 name = "asb-auto-subgen"
-version = "1.0.2"
+version = "1.0.5"
 source = { editable = "." }
 dependencies = [
     { name = "dataclasses-json" },
