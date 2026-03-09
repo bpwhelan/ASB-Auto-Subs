@@ -8,9 +8,18 @@ from groq_sub_gen import watcher
 from groq_sub_gen.shared import config
 
 def _asb_websocket_server_dir() -> Path:
-    packaged_path = Path(asbplayer.__file__).resolve().parent / "scripts" / "web-socket-server"
-    if (packaged_path / "main.go").exists():
-        return packaged_path
+    module_file = getattr(asbplayer, "__file__", None)
+    if module_file:
+        packaged_path = Path(module_file).resolve().parent / "scripts" / "web-socket-server"
+        if (packaged_path / "main.go").exists():
+            return packaged_path
+
+    module_paths = getattr(asbplayer, "__path__", None)
+    if module_paths:
+        for module_path in module_paths:
+            packaged_path = Path(module_path).resolve() / "scripts" / "web-socket-server"
+            if (packaged_path / "main.go").exists():
+                return packaged_path
 
     repo_path = Path(__file__).resolve().parents[1] / "asbplayer" / "scripts" / "web-socket-server"
     if (repo_path / "main.go").exists():
