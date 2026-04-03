@@ -30,6 +30,27 @@ OR
 uv tool install asb-auto-subgen[local]
 ```
 
+### Updating
+
+If you already have the tool installed, update it with the same method you used to install it:
+
+```bash
+pip install --upgrade asb-auto-subgen
+```
+
+```bash
+uv tool upgrade asb-auto-subgen
+```
+
+If you use local Whisper support, update with:
+
+```bash
+pip install --upgrade "asb-auto-subgen[local]"
+```
+
+```bash
+uv tool install --upgrade "asb-auto-subgen[local]"
+```
 
 ### Requirements
 

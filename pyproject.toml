@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "asb-auto-subgen"
-version = "1.0.5"
+version = "1.0.6"
 description = "A tool for downloading YouTube audio, generating subtitles, and sending them to an HTTP endpoint."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -55,4 +55,3 @@ packages = ["groq_sub_gen", "asbplayer"]
 dev = [
     "build>=1.4.0",
 ]
-

@@ -64,7 +64,7 @@ def is_go_installed():
         print(f"Error while checking Go installation: {e.stderr.strip()}")
         return False
 
-async def main():
+async def async_main():
     print("Checking for Go installation...")
     if config.RUN_ASB_WEBSOCKET_SERVER and is_go_installed():
         asbplayer_wss = await run_asb_websocket_go_server_nonblocking()
@@ -75,5 +75,8 @@ async def main():
 
     print("Exiting Groq Sub Gen")
 
+def main():
+    asyncio.run(async_main())
+
 if __name__ == '__main__':
-    asyncio.run(main())
+    main()
