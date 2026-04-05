@@ -10,7 +10,6 @@ from dataclasses import dataclass
 import requests
 import yaml
 import yt_dlp
-import torch
 from dataclasses_json import dataclass_json
 
 # --- Custom Exception ---
@@ -297,19 +296,27 @@ class StableTSProcessor:
 
     def __init__(self, model="turbo", extra_args=None):
         self.model = model
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.extra_args = extra_args or []
-        
-        if config.model:
-            self.model = config.model
+
+        try:
+            import torch
+        except ImportError as exc:
+            raise SubtitleError(
+                "Local transcription requires optional dependency 'torch'. "
+                "Install `asb-auto-subgen[local]` or set `process_locally: false` in config.yaml."
+            ) from exc
+
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
         try:
             import stable_whisper
-        except ImportError:
+        except ImportError as exc:
             raise SubtitleError(
-                "stable_whisper (stable-ts) is not installed. Please install it via pip.")
+                "Local transcription requires `stable-ts`. "
+                "Install `asb-auto-subgen[local]` or set `process_locally: false` in config.yaml."
+            ) from exc
         try:
-            self.model = stable_whisper.load_model(model, device=self.device)
+            self.model = stable_whisper.load_model(self.model, device=self.device)
         except Exception as e:
             logging.error(f"Failed to load stable-ts model: {e}")
             raise SubtitleError(f"Failed to load stable-ts model: {e}")

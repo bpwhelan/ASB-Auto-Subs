@@ -379,7 +379,9 @@ async def main():
         groq_client = Groq(api_key=config.GROQ_API_KEY)
         if config.process_locally:
             logging.info("Processing subtitles locally.")
-            processor = SubtitleProcessor(local_processor=StableTSProcessor())
+            processor = SubtitleProcessor(
+                local_processor=StableTSProcessor(model=config.whisper_model)
+            )
         else:
             if not config.GROQ_API_KEY:
                 logging.error("GROQ_API_KEY not set. Cannot proceed.")
@@ -387,7 +389,7 @@ async def main():
             processor = SubtitleProcessor(groq_client=groq_client)
         logging.info("Groq client initialized.")
     except Exception as e:
-        logging.error(f"Failed to initialize Groq client: {e}")
+        logging.error(f"Failed to initialize subtitle processing: {e}")
         return
 
     previous_clipboard_content = ""

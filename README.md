@@ -67,7 +67,7 @@ This will be generated on first run if it doesn't exist (idk where).
 1. Open the `config.yaml` file in a text editor .
 2. Update the configuration values as needed. For example:
    ```yaml
-   process_locally: true
+   process_locally: false
    whisper_model: "small"
    GROQ_API_KEY: ""
    RUN_ASB_WEBSOCKET_SERVER: true
@@ -82,7 +82,7 @@ This will be generated on first run if it doesn't exist (idk where).
 
 #### What Each Config Does:
 
-- `process_locally`: Determines if the transcription is done locally or via the groq API.
+- `process_locally`: Determines if the transcription is done locally or via the groq API. Set this to `true` only if you installed `asb-auto-subgen[local]`.
 - `whisper_model`: The whisper model to use for local transcription.
 - `GROQ_API_KEY`: Your API key for accessing Groq's services.
 - `RUN_ASB_WEBSOCKET_SERVER`: Whether to run the ASBPlayer WebSocket server.
