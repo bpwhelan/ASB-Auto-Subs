@@ -82,7 +82,7 @@ def send_subtitles_http(srt_file_path):
 @dataclass_json
 @dataclass
 class Config:
-    process_locally: bool = True
+    process_locally: bool = False
     whisper_model: str = "turbo"
     RUN_ASB_WEBSOCKET_SERVER: bool = True
     GROQ_API_KEY: str = ""
@@ -93,7 +93,7 @@ class Config:
     # path_to_watch: str = "./watch"
     cookies: str = ""
 
-    def __init__(self, process_locally=True, GROQ_API_KEY="", whisper_model="turbo", RUN_ASB_WEBSOCKET_SERVER=True, model="whisper-large-v3-turbo", output_dir="output", language="ja", skip_language_check=False, path_to_watch="./watch", cookies="", *args, **kwargs):
+    def __init__(self, process_locally=False, GROQ_API_KEY="", whisper_model="turbo", RUN_ASB_WEBSOCKET_SERVER=True, model="whisper-large-v3-turbo", output_dir="output", language="ja", skip_language_check=False, path_to_watch="./watch", cookies="", *args, **kwargs):
         self.process_locally = process_locally
         self.GROQ_API_KEY = GROQ_API_KEY
         self.whisper_model = whisper_model
